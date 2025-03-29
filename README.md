@@ -1,5 +1,3 @@
-
-
 # Accept Bitcoin Payment
 
 A lightweight module for accepting Bitcoin payments by scanning HD wallet addresses derived from a provided zpub. This module converts a zpub to an xpub, scans derived addresses using the Blockstream API, and returns payment details including the next unused address and a sorted list of transactions.
@@ -13,20 +11,16 @@ A lightweight module for accepting Bitcoin payments by scanning HD wallet addres
 
 ## Installation
 
-Install via npm:
-
 ```bash
 npm install accept-bitcoin-payment
 ```
 
 ## Usage
 
-Below is an example of how to use the module in your project:
-
 ```js
-import { fetchPaymentInfo, convertZpubToXpub } from "accept-bitcoin-payment";
+import { fetchPaymentInfo } from "accept-bitcoin-payment";
 
-const zpub = "your_zpub_here"; // Replace with your actual zpub
+const zpub = "your_zpub_here";
 
 (async () => {
   try {
@@ -40,15 +34,6 @@ const zpub = "your_zpub_here"; // Replace with your actual zpub
 ```
 
 ## API
-
-### `convertZpubToXpub(zpub: string): string`
-
-Converts a zpub to an xpub by replacing the version bytes. This conversion is necessary for compatibility with the underlying BIP32 library.
-
-- **Parameters:**
-  - `zpub` (string): The extended public key in zpub format.
-- **Returns:**
-  - A string containing the converted xpub.
 
 ### `fetchPaymentInfo(zpub: string, branch?: number, startIndex?: number, gapLimit?: number): Promise<{ nextAddress: string, txns: Array<Object> }>`
 
@@ -72,7 +57,7 @@ Scans addresses derived from the provided zpub and gathers payment information.
         timestamp: block_time_or_null
       }
       ```
-      
+
 Transactions are sorted by timestamp in ascending order.
 
 ## Contributing
