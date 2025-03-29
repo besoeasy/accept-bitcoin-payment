@@ -18,18 +18,25 @@ npm install accept-bitcoin-payment
 ## Usage
 
 ```js
-import { fetchPaymentInfo } from "accept-bitcoin-payment";
+import { fetchPaymentInfo, checkAddressUsage } from "accept-bitcoin-payment";
 
-const zpub = "your_zpub_here";
+const zpub =
+  "zpub6qU3pMzBXcDxURjEZXDna8h8VJvDAmmUChYspM5NEZvHYxW5z48wKM8uMSqwY5pJEML41Aq7FC3hLSwa14EG42mVA1izYJzxo9TSt4W7Xii";
 
 (async () => {
   try {
-   const { deposit, txns } = await fetchPaymentInfo(zpub);
-    console.log("Next available :", deposit);
-    console.log("Transactions:", txns);
-    console.log("Transaction count:", txns.length);
+    const { nextAddr, freshAddr, txns } = await fetchPaymentInfo(zpub);
+    console.log("Next Address:", nextAddr);
+    console.log("Fresh Addresses:", freshAddr);
+    console.log("Transaction Count:", txns.length);
+
+    // Minimal usage check for the first fresh address
+    if (freshAddr.length > 0) {
+      const usage = await checkAddressUsage(freshAddr[0]);
+      console.log("Address Usage for", freshAddr[0], ":", usage);
+    }
   } catch (error) {
-    console.error("Error fetching payment info:", error);
+    console.error("Error:", error);
   }
 })();
 ```
