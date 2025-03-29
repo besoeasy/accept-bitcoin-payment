@@ -1,0 +1,33 @@
+{
+  "name": "accept-bitcoin-payment",
+  "version": "0.0.1",
+  "description": " A self hosted JS libarary which you can use to accept bitcoin payments directly. ",
+  "main": "index.js",
+  "type": "module",
+  "keywords": [
+    "bitcoin",
+    "zpub",
+    "payments",
+    "hdwallet",
+    "crypto",
+    "cryptocurrency",
+    "wallet",
+    "self-hosted"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/besoeasy/accept-bitcoin-payment.git"
+  },
+  "author": "besoeasy",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/besoeasy/accept-bitcoin-payment/issues"
+  },
+  "homepage": "https://github.com/besoeasy/accept-bitcoin-payment#readme",
+  "dependencies": {
+    "bip32": "^5.0.0-rc.0",
+    "bitcoinjs-lib": "^6.1.7",
+    "bs58check": "^4.0.0",
+    "tiny-secp256k1": "^2.2.3"
+  }
+}

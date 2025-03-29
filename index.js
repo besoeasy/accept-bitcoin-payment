@@ -109,10 +109,10 @@ function processTransactionForAddress(address, tx) {
  * @param {string} zpub - The extended public key (zpub format).
  * @param {number} branch - Derivation branch (0 for external, 1 for change), default 0.
  * @param {number} startIndex - Starting index (default 0).
- * @param {number} gapLimit - Maximum consecutive unused addresses to allow (default 20).
+ * @param {number} gapLimit - Maximum consecutive unused addresses to allow (default 5).
  * @returns {Promise<object>} - Object of the form { nextAddress: string, txns: [] }
  */
-export async function fetchPaymentInfo(zpub, branch = 0, startIndex = 0, gapLimit = 20) {
+export async function fetchPaymentInfo(zpub, branch = 0, startIndex = 0, gapLimit = 5) {
   const xpub = convertZpubToXpub(zpub);
   const network = bitcoin.networks.bitcoin;
   const node = bip32.fromBase58(xpub, network);
