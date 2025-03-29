@@ -25,7 +25,10 @@ export function convertZpubToXpub(zpub) {
  */
 async function getTxnsForAddress(address) {
   try {
-    const response = await fetch(`https://blockstream.info/api/address/${address}/txs`);
+    const response = await fetch(
+      `https://blockstream.info/api/address/${address}/txs`
+    );
+
     if (!response.ok) {
       throw new Error(`HTTP error: ${response.status}`);
     }
@@ -54,12 +57,13 @@ function processTransactionForAddress(address, tx) {
   const results = [];
   const txid = tx.txid;
   // Use block_time if available; otherwise, null.
-  const timestamp = tx.status && tx.status.block_time ? tx.status.block_time : null;
+  const timestamp =
+    tx.status && tx.status.block_time ? tx.status.block_time : null;
 
   // Calculate total received amount: check each vout with matching address.
   let totalReceived = 0;
   if (Array.isArray(tx.vout)) {
-    tx.vout.forEach(output => {
+    tx.vout.forEach((output) => {
       if (output.scriptpubkey_address === address) {
         totalReceived += output.value;
       }
@@ -78,7 +82,7 @@ function processTransactionForAddress(address, tx) {
   // Calculate total sent amount: check each vin where the previous output is from our address.
   let totalSent = 0;
   if (Array.isArray(tx.vin)) {
-    tx.vin.forEach(input => {
+    tx.vin.forEach((input) => {
       if (input.prevout && input.prevout.scriptpubkey_address === address) {
         totalSent += input.prevout.value;
       }
@@ -112,7 +116,13 @@ function processTransactionForAddress(address, tx) {
  * @param {number} gapLimit - Maximum consecutive unused addresses to allow (default 5).
  * @returns {Promise<object>} - Object of the form { nextAddress: string, txns: [] }
  */
-export async function fetchPaymentInfo(zpub, branch = 0, startIndex = 0, gapLimit = 5) {
+
+export async function fetchPaymentInfo(
+  zpub,
+  branch = 0,
+  startIndex = 0,
+  gapLimit = 8
+) {
   const xpub = convertZpubToXpub(zpub);
   const network = bitcoin.networks.bitcoin;
   const node = bip32.fromBase58(xpub, network);
@@ -120,8 +130,9 @@ export async function fetchPaymentInfo(zpub, branch = 0, startIndex = 0, gapLimi
   let unusedCount = 0;
   let currentIndex = startIndex;
   let allTxns = [];
-  let nextAddress = null;
+  let lastUsedIndex = startIndex - 1;
 
+  // Scan until gapLimit consecutive unused addresses are found
   while (unusedCount < gapLimit) {
     // Derive address at m/branch/currentIndex
     const child = node.derive(branch).derive(currentIndex);
@@ -130,28 +141,34 @@ export async function fetchPaymentInfo(zpub, branch = 0, startIndex = 0, gapLimi
       network: network,
     }).address;
 
-    console.log(`Scanning index ${currentIndex}: ${address}`);
-
     // Fetch transactions for the address
     const txns = await getTxnsForAddress(address);
 
     if (txns.length === 0) {
       unusedCount++;
-      if (nextAddress === null) {
-        nextAddress = address;
-      }
     } else {
-      unusedCount = 0; // Reset gap counter when a used address is found.
-      txns.forEach(tx => {
+      unusedCount = 0; // Reset counter when a used address is found.
+      lastUsedIndex = currentIndex;
+      txns.forEach((tx) => {
         const processed = processTransactionForAddress(address, tx);
         allTxns.push(...processed);
       });
     }
-
     currentIndex++;
   }
 
-  // Sort transactions by timestamp in ascending order (transactions without timestamp will be placed last)
+  // Build an array of the next gapLimit addresses after the last used index.
+  const nextAddresses = [];
+  for (let i = 1; i <= gapLimit; i++) {
+    const child = node.derive(branch).derive(lastUsedIndex + i);
+    const address = bitcoin.payments.p2wpkh({
+      pubkey: Buffer.from(child.publicKey),
+      network: network,
+    }).address;
+    nextAddresses.push(address);
+  }
+
+  // Sort transactions by timestamp in ascending order (null timestamps go last)
   allTxns.sort((a, b) => {
     if (a.timestamp === null && b.timestamp === null) return 0;
     if (a.timestamp === null) return 1;
@@ -159,5 +176,9 @@ export async function fetchPaymentInfo(zpub, branch = 0, startIndex = 0, gapLimi
     return a.timestamp - b.timestamp;
   });
 
-  return { nextAddress, txns: allTxns };
+  return {
+    nextAddr: nextAddresses[Math.floor(Math.random() * nextAddresses.length)],
+    freshAddr: nextAddresses,
+    txns: allTxns,
+  };
 }

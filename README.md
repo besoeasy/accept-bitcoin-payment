@@ -24,9 +24,10 @@ const zpub = "your_zpub_here";
 
 (async () => {
   try {
-    const result = await fetchPaymentInfo(zpub);
-    console.log("Next available address:", result.nextAddress);
-    console.log("Transactions:", result.txns);
+   const { deposit, txns } = await fetchPaymentInfo(zpub);
+    console.log("Next available :", deposit);
+    console.log("Transactions:", txns);
+    console.log("Transaction count:", txns.length);
   } catch (error) {
     console.error("Error fetching payment info:", error);
   }
