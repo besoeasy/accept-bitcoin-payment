@@ -88,17 +88,17 @@ export async function nextAddress(zpub, offset = 0) {
   const branchNode = node.derive(0);
 
   let currentIndex = 0;
-  let nextAddrx = null;
+  let nextAddrx = [];
   let offsetCount = offset;
 
-  while (nextAddrx === null) {
+  while (nextAddrx < 100) {
     const address = deriveAddress(branchNode, currentIndex, network);
     const txns = await getTxnsForAddress(address);
     if (txns.length === 0) {
       if (offsetCount > 0) {
         offsetCount--;
       } else {
-        nextAddrx = address;
+        nextAddrx.push(address);
       }
     }
 
@@ -108,5 +108,6 @@ export async function nextAddress(zpub, offset = 0) {
   return {
     index: currentIndex,
     address: nextAddrx,
+    nextAddress: nextAddrx[0],
   };
 }
