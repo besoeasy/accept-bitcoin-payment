@@ -91,7 +91,7 @@ export async function nextAddress(zpub, offset = 0) {
   let nextAddrx = [];
   let offsetCount = offset;
 
-  while (nextAddrx < 100) {
+  while (nextAddrx.length < 100) {
     const address = deriveAddress(branchNode, currentIndex, network);
     const txns = await getTxnsForAddress(address);
     if (txns.length === 0) {

@@ -1,6 +1,6 @@
 {
   "name": "accept-bitcoin-payment",
-  "version": "0.0.5",
+  "version": "0.1.0",
   "description": " A self hosted JS libarary which you can use to accept bitcoin payments directly. ",
   "main": "index.js",
   "type": "module",
